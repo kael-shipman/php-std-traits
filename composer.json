@@ -1,6 +1,6 @@
 {
     "name" : "kael-shipman/php-std-traits",
-    "description" : "An assortment of traits that help to implement standard PHP interfaces like ArrayAccess, Iterator, etc., as well as a few other useful features.",
+    "description" : "An assortment of traits, exceptions and minor classes that help to implement standard PHP interfaces like ArrayAccess, Iterator, etc., as well as a few other useful features.",
     "type" : "library",
     "keywords" : [ "traits" ],
     "license" : "MIT",
