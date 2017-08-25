@@ -1,0 +1,34 @@
+{
+    "name" : "kael-shipman/php-std-traits",
+    "description" : "An assortment of traits that help to implement standard PHP interfaces like ArrayAccess, Iterator, etc., as well as a few other useful features.",
+    "type" : "library",
+    "keywords" : [ "traits" ],
+    "license" : "MIT",
+    "authors" : [
+        {
+            "name" : "Kael Shipman",
+            "email" : "kael.shipman@gmail.com",
+            "homepage" : "https://colors.kaelshipman.me",
+            "role" : "Developer"
+        }
+    ],
+    "require" : {
+        "php" : ">=5.5"
+    },
+    "require-dev" : {
+        "phpunit/phpunit" : ">=4.8"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "KS\\" : "src/"
+        },
+        "files": [
+            "src/Exceptions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4" : {
+            "Test\\": "tests/classes"
+        }
+    }
+}
