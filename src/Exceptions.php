@@ -1,5 +1,5 @@
 <?php
 namespace KS;
 
-HaltEventPropagationException extends \RuntimeException { }
+class HaltEventPropagationException extends \RuntimeException { }
 
