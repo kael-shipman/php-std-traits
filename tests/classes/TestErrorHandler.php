@@ -4,9 +4,9 @@ namespace Test;
 class TestErrorHandler {
     use \KS\ErrorHandlerTrait;
 
-    public function produceError($field, $msg, $errorType=null, $new=false) {
+    public function produceError($field, $errorType=null, $msg, $new=false) {
         if ($new) $this->clearError($field);
-        $this->setError($field, $msg, $errorType);
+        $this->setError($field, $errorType, $msg);
     }
 
     public function deleteError($field, $which=null) {
