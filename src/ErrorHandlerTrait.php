@@ -22,6 +22,9 @@ trait ErrorHandlerTrait {
         }
         return $num;
     }
+    public function hasErrors(string $field=null) {
+        return (bool)$this->numErrors($field);
+    }
     protected function clearError(string $field, string $which=null) {
         if (!array_key_exists($field, $this->errors)) return $this;
         if ($which && !array_key_exists($which, $this->errors[$field])) return $this;
@@ -34,7 +37,7 @@ trait ErrorHandlerTrait {
     protected function clearAllErrors() {
         $this->errors = [];
     }
-    protected function setError(string $field, string $val, string $which=null) {
+    protected function setError(string $field, string $which=null, string $val) {
         if (!array_key_exists($field, $this->errors)) $this->errors[$field] = array();
         if ($which) $this->errors[$field][$which] = $val;
         else $this->errors[$field][] = $val;
