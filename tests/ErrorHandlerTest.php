@@ -1,5 +1,7 @@
 <?php
 
+use \KS\GenericError;
+
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase {
     public function testErrors() {
         $t = new \Test\TestErrorHandler();
@@ -11,7 +13,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals([], $t->getErrors());
         $this->assertEquals([], $t->getErrors('testField'));
 
-        $t->produceError('testField', null, 'Email is bad');
+        $t->produceError('testField', null, new GenericError('Email is bad'));
         $this->assertTrue($t->hasErrors());
         $this->assertTrue($t->hasErrors('testField'));
         $this->assertFalse($t->hasErrors('testField2'));
@@ -20,7 +22,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase {
         $this->assertContains('Email is bad', serialize($t->getErrors()));
         $this->assertContains('Email is bad', serialize($t->getErrors('testField')));
 
-        $t->produceError('testField', 'email-required', 'Email is required');
+        $t->produceError('testField', 'email-required', new GenericError('Email is required'));
         $this->assertTrue($t->hasErrors());
         $this->assertTrue($t->hasErrors('testField'));
         $this->assertFalse($t->hasErrors('testField2'));
@@ -30,7 +32,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase {
         $this->assertContains('Email is required', serialize($t->getErrors()));
         $this->assertContains('Email is required', serialize($t->getErrors('testField')));
 
-        $t->produceError('testField', 'email-required', 'Email is seriously required');
+        $t->produceError('testField', 'email-required', new GenericError('Email is seriously required'));
         $this->assertTrue($t->hasErrors());
         $this->assertTrue($t->hasErrors('testField'));
         $this->assertFalse($t->hasErrors('testField2'));
@@ -48,7 +50,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase {
         $this->assertContains('Email is bad', serialize($t->getErrors()));
         $this->assertContains('Email is bad', serialize($t->getErrors('testField')));
 
-        $t->produceError('testField2', 'Name is required', 'name-required');
+        $t->produceError('testField2', 'name-required', new GenericError('Name is required'));
         $this->assertTrue($t->hasErrors());
         $this->assertTrue($t->hasErrors('testField'));
         $this->assertTrue($t->hasErrors('testField2'));

@@ -37,7 +37,7 @@ trait ErrorHandlerTrait {
     protected function clearAllErrors() {
         $this->errors = [];
     }
-    protected function setError(string $field, string $which=null, string $val) {
+    protected function setError(string $field, string $which=null, ErrorInterface $val) {
         if (!array_key_exists($field, $this->errors)) $this->errors[$field] = array();
         if ($which) $this->errors[$field][$which] = $val;
         else $this->errors[$field][] = $val;
