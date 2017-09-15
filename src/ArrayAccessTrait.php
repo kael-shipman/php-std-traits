@@ -7,7 +7,7 @@ trait ArrayAccessTrait {
     public function offsetExists($offset) {
         return array_key_exists($offset, $this->elements);
     }
-    public function offsetGet($offset) {
+    public function &offsetGet($offset) {
         return $this->elements[$offset];
     }
     public function offsetSet($offset, $value) {
