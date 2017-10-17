@@ -7,6 +7,8 @@ namespace KS;
  */
 class BaseConfig implements BaseConfigInterface {
     protected $config;
+    protected $defaultFile;
+    protected $localFile;
     const PROFILE_PROD = 'production';
 
 
@@ -33,6 +35,9 @@ class BaseConfig implements BaseConfigInterface {
 
         $this->config = array_replace($defaultConfig, $localConfig);
         $this->checkConfig();
+
+        $this->defaultFile = $defaultConfigFile;
+        $this->localFile = $localConfigFile;
     }
 
     /** @inheritDoc */
