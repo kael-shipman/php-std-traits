@@ -21,6 +21,8 @@ trait ArrayAccessTrait {
             if ($k == $offset) continue;
             $data[] = $e;
         }
+        $this->elements = $data;
+
         if (is_array($this->iteratorKeys)) {
             $keys = [];
             foreach($this->iteratorKeys as $k) {
