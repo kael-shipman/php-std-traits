@@ -33,7 +33,7 @@ class BaseConfig implements BaseConfigInterface {
         if ($localConfig && !is_array($localConfig)) throw new ConfigFileFormatException("Local configuration file MUST return an array.");
         if (!$localConfig) $localConfig = [];
 
-        $this->config = array_replace($defaultConfig, $localConfig);
+        $this->config = array_replace_recursive($defaultConfig, $localConfig);
         $this->checkConfig();
 
         $this->defaultFile = $defaultConfigFile;
