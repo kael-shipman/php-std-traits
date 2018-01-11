@@ -52,8 +52,10 @@ class BaseConfigTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testConfigTestsConfigWhenNotInProduction() {
+        $this->markTestIncomplete();
     }
 
     public function testConfigDumpsConfigCorrectly() {
+        $this->markTestIncomplete();
     }
 }

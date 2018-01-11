@@ -5,7 +5,7 @@ trait ErrorHandlerTrait {
     protected $errors = array();
 
     public function getErrors(string $field=null) {
-        if ($field) return $this->errors[$field] ?: array();
+        if ($field) return array_key_exists($field, $this->errors) ? $this->errors[$field] : [];
         else {
             $errors = array();
             foreach($this->errors as $field => $e) $errors = array_merge($errors, $e);
