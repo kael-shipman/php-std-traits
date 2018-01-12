@@ -97,6 +97,14 @@ class BaseConfig implements BaseConfigInterface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function overrideConfig(array $config) : void
+    {
+        $this->config = array_replace_recursive($this->config, $config);
+    }
+
+    /**
      * If a certain config getter requires parameters, you can provide parameter stubs for by overriding
      * this method and using it to return a map of method names to parameter arrays. For example, if your
      * `getComplexThing` method requires parameters `$x` and `$y`, you can provide an array like this:
