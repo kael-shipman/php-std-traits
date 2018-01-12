@@ -80,7 +80,7 @@ class BaseConfig implements BaseConfigInterface {
      * @throws MissingConfigException in the even that a given config key isn't loaded
      */
     protected function get(string $key) {
-        if (!isset($this->config[$key])) throw new MissingConfigException("Your configuration doesn't have a value for the key `$key`");
+        if (!array_key_exists($key, $this->config)) throw new MissingConfigException("Your configuration doesn't have a value for the key `$key`");
         return $this->config[$key];
     }
 
