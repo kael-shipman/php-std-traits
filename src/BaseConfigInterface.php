@@ -24,21 +24,17 @@ interface BaseConfigInterface {
     public function getExecutionProfile(): string;
 
     /**
+     * Reload config from original files provided
+     *
+     * @return void
+     */
+    public function reload(): void;
+
+    /**
      * Dump the full parsed configuration to string.
      *
      * @return string The dumped configuration
      */
     public function dump(): string;
-
-    /**
-     * Merges the given array into the internal configuration, allowing runtime overrides of configuration.
-     *
-     * This is mainly to accommodate scenarios in which you might have a default file, a local override, and then
-     * perhaps some command-line flags that override even the local override file.
-     *
-     * @param array $config An array of key-value pairs to merge
-     * @return void
-     */
-    public function overrideConfig(array $config) : void;
 }
 

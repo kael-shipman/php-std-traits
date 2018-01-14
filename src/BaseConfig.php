@@ -26,18 +26,10 @@ class BaseConfig implements BaseConfigInterface {
     public function __construct(string $defaultConfigFile, string $localConfigFile) {
         if (!is_file($defaultConfigFile)) throw new NonexistentFileException("You must have a global configurations file at `$defaultConfigFile`. You should define all default configurations in this file, and it should be version controlled. You may optionally provide a second file, `$localConfigFile`, for overriding config locally, and this file should NOT be version controlled.");
 
-        $defaultConfig = require $defaultConfigFile;
-        $localConfig = @include $localConfigFile;
-
-        if (!is_array($defaultConfig)) throw new ConfigFileFormatException("Default configuration file MUST return an array.");
-        if ($localConfig && !is_array($localConfig)) throw new ConfigFileFormatException("Local configuration file MUST return an array.");
-        if (!$localConfig) $localConfig = [];
-
-        $this->config = array_replace_recursive($defaultConfig, $localConfig);
-        $this->checkConfig();
-
         $this->defaultFile = $defaultConfigFile;
         $this->localFile = $localConfigFile;
+
+        $this->reload();
     }
 
     /** @inheritDoc */
@@ -89,19 +81,27 @@ class BaseConfig implements BaseConfigInterface {
         return $this->get('exec-profile');
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function reload(): void
+    {
+        $defaultConfig = require $this->defaultFile;
+        $localConfig = @include $this->localFile;
+
+        if (!is_array($defaultConfig)) throw new ConfigFileFormatException("Default configuration file MUST return an array.");
+        if ($localConfig && !is_array($localConfig)) throw new ConfigFileFormatException("Local configuration file MUST return an array.");
+        if (!$localConfig) $localConfig = [];
+
+        $this->config = array_replace_recursive($defaultConfig, $localConfig);
+        $this->checkConfig();
+    }
+
     /** @inheritDoc */
     public function dump(): string {
         $dump = array();
         foreach ($this->config as $k => $v) $dump[] = "$k: `$v`;";
         return implode("\n", $dump);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function overrideConfig(array $config) : void
-    {
-        $this->config = array_replace_recursive($this->config, $config);
     }
 
     /**

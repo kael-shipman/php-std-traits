@@ -2,7 +2,8 @@
 
 return [
     'exec-profile' => 'production',
-    'test1' => 'some val',
+    'test1' => 'alt val',
     'test2' => 'other val',
 ];
+
 
