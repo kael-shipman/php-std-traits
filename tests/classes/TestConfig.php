@@ -1,7 +1,7 @@
 <?php
 namespace Test;
 
-class TestConfig extends \KS\BaseConfig implements TestConfigInterface
+class TestConfig extends \KS\WebappConfig implements TestConfigInterface
 {
     public function getTest1(): string
     {

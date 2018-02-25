@@ -1,23 +1,22 @@
 <?php
+namespace KS;
 
-use \KS\BaseConfig;
-
-class BaseConfigTest extends \PHPUnit\Framework\TestCase {
+class WebappConfigTest extends \PHPUnit\Framework\TestCase {
     public function testConfigRequiresBothConfigFilesToBeSpecified() {
         try {
-            $c = new BaseConfig(__DIR__.'/configs/validconfig.php');
+            $c = new WebappConfig(__DIR__.'/configs/validconfig.php');
             $this->fail("Should have thrown an argument count error.");
-        } catch (ArgumentCountError $e) {
+        } catch (\ArgumentCountError $e) {
             $this->assertTrue(true, "This is the correct behavior");
         }
 
-        $c = new BaseConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/emptyconfig.php');
-        $this->assertTrue($c instanceof \KS\BaseConfigInterface, "Should successfully instantiate config");
+        $c = new WebappConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/emptyconfig.php');
+        $this->assertTrue($c instanceof \KS\WebappConfigInterface, "Should successfully instantiate config");
     }
 
     public function testConfigRequiresDefaultFileToExist() {
         try {
-            $c = new BaseConfig(__DIR__.'/configs/bunkconfig.php', __DIR__.'/configs/bunkconfig.override.php');
+            $c = new WebappConfig(__DIR__.'/configs/bunkconfig.php', __DIR__.'/configs/bunkconfig.override.php');
             $this->fail("Should have thrown an exception.");
         } catch (\KS\NonexistentFileException $e) {
             $this->assertTrue(true, "This is the correct behavior");
@@ -25,20 +24,20 @@ class BaseConfigTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testConfigDoesntRequireOverrideToExist() {
-        $c = new BaseConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/bunkconfig.override.php');
-        $this->assertTrue($c instanceof \KS\BaseConfigInterface, "Should successfully instantiate config");
+        $c = new WebappConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/bunkconfig.override.php');
+        $this->assertTrue($c instanceof \KS\WebappConfigInterface, "Should successfully instantiate config");
     }
 
     public function testConfigRequiresFilesToReturnArrays() {
         try {
-            $c = new BaseConfig(__DIR__.'/configs/nonarrayconfig.php', __DIR__.'/configs/nonarrayconfig.override.php');
+            $c = new WebappConfig(__DIR__.'/configs/nonarrayconfig.php', __DIR__.'/configs/nonarrayconfig.override.php');
             $this->fail("Should have thrown an exception.");
         } catch (\KS\ConfigFileFormatException $e) {
             $this->assertTrue(true, "This is the correct behavior");
         }
 
         try {
-            $c = new BaseConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/nonarrayconfig.override.php');
+            $c = new WebappConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/nonarrayconfig.override.php');
             $this->fail("Should have thrown an exception.");
         } catch (\KS\ConfigFileFormatException $e) {
             $this->assertTrue(true, "This is the correct behavior");
@@ -47,7 +46,7 @@ class BaseConfigTest extends \PHPUnit\Framework\TestCase {
 
     public function testConfigGetsExecutionProfile() {
         $config = require __DIR__.'/configs/validconfig.php';
-        $c = new BaseConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/emptyconfig.php');
+        $c = new WebappConfig(__DIR__.'/configs/validconfig.php', __DIR__.'/configs/emptyconfig.php');
         $this->assertEquals($config['exec-profile'], $c->getExecutionProfile(), "Should return the correct execution profile");
     }
 
@@ -57,7 +56,7 @@ class BaseConfigTest extends \PHPUnit\Framework\TestCase {
         try {
             $c = new \Test\TestConfig(__DIR__.'/configs/missingconfig.php', __DIR__.'/configs/emptyconfig.php');
             $this->fail("Should have thrown MissingConfigException");
-        } catch (\KS\MissingConfigException $e) {
+        } catch (\KS\InvalidConfigException $e) {
             $this->assertContains("`test2`", $e->getMessage());
         }
 
