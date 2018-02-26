@@ -37,7 +37,7 @@ abstract class AbstractCliConfig extends AbstractConfig
             if (is_dir($this->globalConfDir)) {
                 $d = dir($this->globalConfDir);
                 while (($f = $d->read()) !== false) {
-                    if ($f[0] === '.') {
+                    if ($f[0] === '.' || is_dir("$this->globalConfDir/$f")) {
                         continue;
                     }
                     $globalFragments = "$this->globalConfDir/$f";
@@ -50,7 +50,7 @@ abstract class AbstractCliConfig extends AbstractConfig
         }
 
         // Merge in user config file
-        if ($this->userConfFile) {
+        if ($this->userConfFile && file_exists($this->userConfFile)) {
             $config = array_replace_recursive($config, $this->parseConfig(file_get_contents($this->userConfFile)));
         }
 
@@ -68,7 +68,8 @@ abstract class AbstractCliConfig extends AbstractConfig
      */
     protected function parseConfig(string $config): array
     {
-        if (!($config = json_decode($config, true)) {
+        $config = json_decode($config, true);
+        if ($config === null) {
             throw new ConfigFileFormatException("Config files should be written in valid JSON");
         }
         return $config;
