@@ -3,60 +3,101 @@ namespace KS;
 
 /**
  * This abstract config class is based on a model of runtime configuration that
- * utilizes a global config file (usually `/etc/[name]/config`), optional global config
- * fragment files (usually `/etc/[name]/config.d/*`), an optional user config file
- * (`/home/[user]/.config/[name]/config`), and finally an array of config parameters
- * passed in via the command line.
+ * utilizes an arbitrary stack of configuration files, directories and arrays.
+ *
+ * The original concept was that a typical application will have the following
+ * config sources:
+ *
+ *  1. A mandatory, internal, system default config file;
+ *  2. An optional global config file (usually `/etc/[name]/config`);
+ *  3. An optional directory of global config fragment files (usually `/etc/[name]/config.d/*`);
+ *  4. An optional user config file (`/home/[user]/.config/[name]/config`); and
+ *  5. An array of config parameters
+ *
+ *  While this is probably a good and safe arrangement, I've found there are too
+ *  many permutations to usefully limit the arguments to known values. Instead, I've
+ *  adapted the constructor to require a single array of arbitrary config arguments.
+ *  (Read the constructor documentation for information on those arguments.)
  */
 abstract class AbstractCliConfig extends AbstractConfig
 {
-    protected $globalConfFile;
-    protected $globalConfDir;
-    protected $userConfFile;
-    protected $commandlineConf = [];
-    public function __construct(string $globalConfFile, string $globalConfDir = null, string $userConfFile = null, array $commandlineConf = [])
-    {
-        $this->globalConfFile = $globalConfFile;
-        $this->globalConfDir = $globalConfDir;
-        $this->userConfFile = $userConfFile;
-        $this->commandlineConf = $commandlineConf;
+    protected $configSources = [];
+    protected $optional = [];
 
+    /**
+     * Constructor for CLI Config object
+     *
+     * This constructor takes one argument, the `$configs` array, which should contain
+     * any of the following:
+     *
+     * * The string pathname of a config file
+     * * The string pathname of a directory containing config files
+     * * An array of key -> value config values
+     *
+     * See class description for suggested usage
+     *
+     * @param array $configSources An array containing configuration sources
+     * @param array $optional An array defining files and directories that are optional
+     */
+    public function __construct(array $configSources, array $optional = [])
+    {
+        $this->configSources = $configSources;
+        $this->optional = $optional;
         $this->reload();
     }
 
+    /**
+     * Reload the config from it's sources (usually done on SIGHUP to load in
+     * configuration changes in files
+     *
+     * @return void
+     */
     public function reload(): void
     {
-        if (!file_exists($this->globalConfFile)) {
-            throw new \RuntimeException("You must provide a global configuration file at `$this->globalConfFile`");
-        }
-        $config = $this->parseConfig(file_get_contents($this->globalConfFile));
-
-        // Merge in config fragment files
-        if ($this->globalConfDir) {
-            $globalFragments = [];
-            if (is_dir($this->globalConfDir)) {
-                $d = dir($this->globalConfDir);
-                while (($f = $d->read()) !== false) {
-                    if ($f[0] === '.' || is_dir("$this->globalConfDir/$f")) {
-                        continue;
+        $config = [];
+        foreach($this->configSources as $src) {
+            // If it's a string, then it's a file or directory path
+            if (is_string($src)) {
+                // If directory, get all config files within it, recursively
+                if (is_dir($src)) {
+                    $getConfigFiles = function(string $path) use (&$getConfigFiles) {
+                        $fragments = [];
+                        if (is_dir($path)) {
+                            $d = dir($path);
+                            while (($f = $d->read()) !== false) {
+                                if ($f[0] === '.') {
+                                    continue;
+                                }
+                                if (is_dir("$path/$f")) {
+                                    $fragments = array_merge($fragments, $getConfigFiles("$path/$f"));
+                                } else {
+                                    $fragments[] = "$path/$f";
+                                }
+                            }
+                        }
+                        return $fragments;
+                    };
+                    $fragments = $getConfigFiles($src);
+                    sort($fragments);
+                    foreach($fragments as $c) {
+                        $config = array_replace_recursive($config, $this->parseConfig(file_get_contents($c)));
                     }
-                    $globalFragments = "$this->globalConfDir/$f";
+
+                // If it's a file, just merge it's contents over the current config array
+                } elseif (is_file($src)) {
+                    $config = array_replace_recursive($config, $this->parseConfig(file_get_contents($src)));
+
+                // If it doesn't exist in the filesystem, and it's not optional, throw an exception
+                } elseif (array_search($src, $this->optional) === false) {
+                    throw (new MissingConfigFileException("Required config file or directory `$src` is missing."))
+                        ->setMissingPath($src);
                 }
-            }
-            sort($globalFragments);
-            foreach($globalFragments as $c) {
-                $config = array_replace_recursive($config, $this->parseConfig(file_get_contents($c)));
+
+            // If the source is an array, just merge it in
+            } elseif (is_array($src)) {
+                $config = array_replace_recursive($config, $src);
             }
         }
-
-        // Merge in user config file
-        if ($this->userConfFile && file_exists($this->userConfFile)) {
-            $config = array_replace_recursive($config, $this->parseConfig(file_get_contents($this->userConfFile)));
-        }
-
-        // Merge in command-line arguments
-        $config = array_replace_recursive($config, $this->commandlineConf);
-
         $this->config = $config;
     }
 

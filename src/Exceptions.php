@@ -7,12 +7,30 @@ class NonexistentFileException extends \RuntimeException { }
 
 class ConfigException extends \RuntimeException { }
 class ConfigFileFormatException extends ConfigException { }
-class InvalidConfigException extends ConfigException {
-    protected $errors;
 
-    public function setConfigErrors(array $errors)
+class MissingConfigFileException extends ConfigException
+{
+    protected $missingPath;
+
+    public function setMissingPath(string $path)
     {
-        $this->errors = $errors;
+        $this->missingPath = $path;
+        return $this;
+    }
+
+    public function getMissingPath()
+    {
+        return $this->missingPath;
+    }
+}
+
+class InvalidConfigException extends ConfigException
+{
+    protected $errors = [];
+
+    public function addConfigError(ErrorInterace $error)
+    {
+        $this->errors[] = $error;
         return $this;
     }
 
