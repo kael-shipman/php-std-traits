@@ -28,7 +28,7 @@ class InvalidConfigException extends ConfigException
 {
     protected $errors = [];
 
-    public function addConfigError(ErrorInterace $error)
+    public function addConfigError($error)
     {
         $this->errors[] = $error;
         return $this;

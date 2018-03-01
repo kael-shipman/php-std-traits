@@ -36,7 +36,9 @@ abstract class AbstractConfig implements ConfigInterface {
 
         if (count($errors) > 0) {
             $e = new InvalidConfigException("Your configuration is incomplete:\n\n  ".implode("\n  ", $errors));
-            $e->setConfigErrors($errors);
+            foreach ($errors as $err) {
+                $e->addConfigError($err);
+            }
             throw $e;
         }
     }
