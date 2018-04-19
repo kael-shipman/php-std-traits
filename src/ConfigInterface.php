@@ -2,7 +2,6 @@
 namespace KS;
 
 interface ConfigInterface {
-
     /**
      * A method that may be used to check that all necessary configuration keys are present.
      *

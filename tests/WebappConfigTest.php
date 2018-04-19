@@ -79,4 +79,14 @@ class WebappConfigTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals('alt val', $c->getTest1());
         unlink(__DIR__.'/configs/tmpconfig.php');
     }
+
+    public function testConfigThrowsExceptionOnInvalidExecProfile()
+    {
+        try {
+            $c = new WebappConfig(__DIR__.'/configs/invalid-exec-prof.php', __DIR__.'/configs/invalid-exec-prof.local.php');
+            $this->assertFail("Should have failed on invalid profile");
+        } catch (InvalidConfigException $e) {
+            $this->assertContains("Programmer: `exec-profile` must be one of the following profiles: ", $e->getMessage());
+        }
+    }
 }

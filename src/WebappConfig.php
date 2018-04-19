@@ -4,7 +4,6 @@ namespace KS;
 class WebappConfig extends AbstractConfig implements WebappConfigInterface {
     protected $defaultFile;
     protected $localFile;
-    const PROFILE_PROD = 'production';
 
 
     /**
@@ -29,7 +28,19 @@ class WebappConfig extends AbstractConfig implements WebappConfigInterface {
 
     /** @inheritDoc */
     public function getExecutionProfile(): string {
-        return $this->get('exec-profile');
+        $prof = $this->get('exec-profile');
+        $validProfs = $this->getValidExecProfiles();
+        if (!in_array($prof, $validProfs, true)) {
+            $msg = "Programmer: `exec-profile` must be one of the following profiles: ".implode(", ", $validProfs);
+            $e = new InvalidConfigException($msg);
+            $e->addConfigError([
+                'status' => 500,
+                'title' => 'Profile Not Valid',
+                'detial' => $msg,
+            ]);
+            throw $e;
+        }
+        return $prof;
     }
 
     /**
@@ -45,7 +56,7 @@ class WebappConfig extends AbstractConfig implements WebappConfigInterface {
         if (!$localConfig) $localConfig = [];
 
         $this->config = array_replace_recursive($defaultConfig, $localConfig);
-        if ($this->getExecutionProfile() !== static::PROFILE_PROD) {
+        if ($this->getExecutionProfile() !== $this->getValidExecProfiles('production')) {
             $this->checkConfig();
         }
     }

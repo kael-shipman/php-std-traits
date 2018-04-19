@@ -43,6 +43,46 @@ abstract class AbstractConfig implements ConfigInterface {
         }
     }
 
+
+    /**
+     * Get this config's list of known profiles.
+     *
+     * The `getExecProfile` function should use this list to check the given profile against.
+     * This is a function that returns a simple array, such that derivative classes may easily
+     * add/change profiles by simply overriding the function and merging in new profile names
+     * or returning a different array.
+     *
+     * In the returned array, the key should represent the _name_ of the profile, i.e., what you
+     * would call the profile in conversation, while the value represents the config string value
+     * that would appear as the value of `exec-profile` in your config.
+     *
+     * @param string | null $profileName The named profile value to get
+     * @return string | string[] Returns a single string if $profileName specified, or an array
+     * of strings if no $profileName specified.
+     */
+    protected function getValidExecProfiles(string $profileName = null)
+    {
+        $validProfs = [
+            'production' => 'production',
+            'dev' => 'dev',
+            'staging' => 'staging',
+            'sandbox' => 'sandbox',
+            'demo' => 'demo',
+            'debug' => 'debug'
+        ];
+
+        if ($profileName) {
+            if (!isset($validProfs[$profileName])) {
+                throw new \RuntimeException("Programmer: you've requested a profile by name `$profileName`, but that profile is not defined");
+            } else {
+                return $validProfs[$profileName];
+            }
+        }
+
+        return $validProfs;
+    }
+
+
     /**
      * An internal method that ensures an error is thrown if the given key is not found in the configuration.
      *
