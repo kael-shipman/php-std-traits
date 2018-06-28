@@ -15,22 +15,19 @@ abstract class AbstractConfig implements ConfigInterface {
     {
         $ref = new \ReflectionClass($this);
         $interfaces = $ref->getInterfaces();
-        $check = array();
+        $errors = array();
         foreach($interfaces as $name => $i) {
             if ($name == 'KS\ConfigInterface') continue;
             $methods = $i->getMethods();
             foreach($methods as $m) {
                 $m = $m->getName();
-                if (substr($m,0,3) == 'get' && strlen($m) > 3) $check[$m] = $m;
-            }
-        }
-
-        $errors = array();
-        foreach($check as $m) {
-            try {
-                $this->$m();
-            } catch (InvalidConfigException $e) {
-                $errors[] = $e->getMessage();
+                if (substr($m,0,3) == 'get' && strlen($m) > 3) {
+                    try {
+                        $this->$m();
+                    } catch (InvalidConfigException $e) {
+                        $errors[] = "Interface $name: {$e->getMessage()}";
+                    }
+                }
             }
         }
 
